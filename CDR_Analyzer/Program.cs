@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System.IO;
 using System.Diagnostics;
+
 
 namespace CDR_Analyzer
 {
@@ -14,21 +14,24 @@ namespace CDR_Analyzer
         static void Main(string[] args)
         {
             var parserController = new ParserController();
-
             parserController.Parse();
-            /*var e = parserController.SavedDataRows.GroupBy(c => c.CallRange).Select(g => g.First()).ToList();
+
+            var requestController = new RequestController();
+            
+            var e = parserController.SavedDataRows.GroupBy(c => c.CallType).Select(g => g.First()).ToList();
             foreach (var g in e)
             {
-                Debug.WriteLine(g.CallRange.ToString());
-            }*/
+                Debug.WriteLine(g.CallType.ToString());
+            }
             
-            Console.WriteLine("*** Witaj w programie analizującym pliki CDR ***");
+            Console.WriteLine("*** Witaj w programie analizującym pliki CDR ***");          
 
-            var request = parserController.SavedDataRows.Where(x => x.CallType == "National").ToList();
+            var request = requestController.BasicRequests(parserController.SavedDataRows);
+
             Console.WriteLine("Liczba zwróconych wyników: " + request.ToList().Count + ", wciśnij \"T\" aby je wyświetlić");
             ConsoleKeyInfo keyPressed = Console.ReadKey();
             if (keyPressed.Key == ConsoleKey.T)
-            {
+            {       
                 foreach (var result in request)
                 {
                     Console.WriteLine();

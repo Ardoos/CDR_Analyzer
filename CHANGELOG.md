@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer [Unreleased]
 
+## 0.0.3 - 2018-05-02
+## Dodane
+- Analiza danych CDR: filtrowanie na podstawie numerów telefonu, daty połączeń, rodzaju i ceny
+- Obsługa zapytań z wiersza poleceń
 
 ## 0.0.2 - 2018-05-01
 ### Dodane
