@@ -27,6 +27,8 @@ namespace CDR_Analyzer
   
         public bool Parse()
         {
+            SavedDataRows = new List<DataRow>();
+
 //            try
 //            {
                 string[] lines;

@@ -14,40 +14,52 @@ namespace CDR_Analyzer
         static void Main(string[] args)
         {
             var parserController = new ParserController();
+            var requestController = new RequestController();
+            var messageController = new MessageController();
+
             parserController.Parse();
 
-            var requestController = new RequestController();
-            
-            var e = parserController.SavedDataRows.GroupBy(c => c.CallType).Select(g => g.First()).ToList();
+            messageController.HelloMessage();
+
+            while (true)
+            {
+                messageController.MainMenuMessage();
+                ConsoleKeyInfo keyPressed = Console.ReadKey();
+
+                if (keyPressed.Key == ConsoleKey.F)
+                {
+                    var request = requestController.FilterRequests(parserController.SavedDataRows, messageController);
+                    parserController.SavedDataRows = request;
+                    parserController.SavedDataRows.TrimExcess();
+                    GC.Collect();
+                }
+ 
+                if (keyPressed.Key == ConsoleKey.R)
+                {
+                    parserController.Parse();
+                    messageController.ResetDataMessage(parserController.SavedDataRows.Count);
+                }
+
+                if (keyPressed.Key == ConsoleKey.W)
+                {
+                    messageController.ShowDataMessage(parserController.SavedDataRows.Count);
+                    keyPressed = Console.ReadKey();
+                    if (keyPressed.Key == ConsoleKey.T)
+                    {
+                        messageController.ShowListRecords(parserController.SavedDataRows);
+                    }
+                }
+                
+                if(keyPressed.Key == ConsoleKey.Escape)
+                {
+                    Environment.Exit(0);
+                }
+            }
+            /*var e = parserController.SavedDataRows.GroupBy(c => c.CallType).Select(g => g.First()).ToList();
             foreach (var g in e)
             {
                 Debug.WriteLine(g.CallType.ToString());
-            }
-            
-            Console.WriteLine("*** Witaj w programie analizującym pliki CDR ***");          
-
-            var request = requestController.BasicRequests(parserController.SavedDataRows);
-
-            Console.WriteLine("Liczba zwróconych wyników: " + request.ToList().Count + ", wciśnij \"T\" aby je wyświetlić");
-            ConsoleKeyInfo keyPressed = Console.ReadKey();
-            if (keyPressed.Key == ConsoleKey.T)
-            {       
-                foreach (var result in request)
-                {
-                    Console.WriteLine();
-                    Console.Write(result.CallId + "   ");
-                    Console.Write(result.PhoneNumber + "   ");
-                    Console.Write(result.CallLine + "   ");
-                    Console.Write(result.DestPhoneNumber + "   ");
-                    Console.Write(result.CallStart + "   ");
-                    Console.Write(result.CallEnd + "   ");
-                    Console.Write(result.CallType + "   ");
-                    Console.Write(result.CallCharge);
-                    Console.WriteLine();
-                }
-            }
-
-            Console.ReadLine();
+            }*/
         }
     }
 }

@@ -9,39 +9,39 @@ using System.Data.Objects.SqlClient;
 namespace CDR_Analyzer
 {
     public class RequestController
-    {
-        public List<ParserController.DataRow> BasicRequests(List<ParserController.DataRow> data)
+    {      
+        public List<ParserController.DataRow> FilterRequests(List<ParserController.DataRow> data, MessageController messageController)
         {
-            Console.WriteLine("*** Rodzaje filtrów ***");
-            Console.WriteLine("- Numer telefonu dzwoniącego, wpisz: dzwoniacy");
-            Console.WriteLine("- Numer telefonu odbierającego, wpisz: odbierajacy");
-            Console.WriteLine("- Data rozpoczęcia połączenia, wpisz: rozpoczecie");
-            Console.WriteLine("- Data zakończenia połączenia, wpisz: zakonczenie");
-            Console.WriteLine("- Rodzaj połączenia, wpisz: rodzaj");
-            Console.WriteLine("- Opłata za połączenie, wpisz: oplata");
-            Console.WriteLine("\nPo czym filtrujesz?");
-            string requestType = Console.ReadLine();
-            var filteredData = SingleRequest(requestType, data);
+            messageController.FilterMenuMessage();
 
-            return filteredData;
+            string requestType = Console.ReadLine();
+            var filteredData = SingleRequest(requestType, data, messageController);
+
+            messageController.FilterDataMessage(filteredData.Count);
+
+            messageController.SaveFilterMessage();
+            ConsoleKeyInfo keyPressed = Console.ReadKey();
+
+            if (keyPressed.Key == ConsoleKey.S)
+                return filteredData;
+            else
+                return data;
         }
 
-        List<ParserController.DataRow> SingleRequest(string requestType, List<ParserController.DataRow> data)
+        List<ParserController.DataRow> SingleRequest(string requestType, List<ParserController.DataRow> data, MessageController messageController)
         {
             string requestMsg = "";
             requestType = requestType.ToUpper();
+            messageController.FilterInstructionMessage(requestType);
             switch (requestType)
-            {
+            {               
                 case "DZWONIACY":
-                    Console.WriteLine("Podaj numer dzwoniącego telefonu");
                     requestMsg = Console.ReadLine();
                     return data.Where(x => x.PhoneNumber == requestMsg).ToList();
                 case "ODBIERAJACY":
-                    Console.WriteLine("Podaj numer odbierającego telefonu");
                     requestMsg = Console.ReadLine();
                     return data.Where(x => x.DestPhoneNumber == requestMsg).ToList();
                 case "ROZPOCZECIE":
-                    Console.WriteLine("Podaj operator [< = >], datę [dd/mm/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
                     requestMsg = Console.ReadLine();
                     string[] startDateLine = requestMsg.Split(' ');
                     if (startDateLine.Count() >= 2)
@@ -72,9 +72,8 @@ namespace CDR_Analyzer
                             }
                         }
                     }
-                    return ErrorMsg(data);
+                    return messageController.FilterErrorMessage(data);
                 case "ZAKONCZENIE":
-                    Console.WriteLine("Podaj operator [< = >], datę [dd/mm/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
                     requestMsg = Console.ReadLine();
                     string[] endDateLine = requestMsg.Split(' ');
                     if (endDateLine.Count() >= 2)
@@ -105,13 +104,11 @@ namespace CDR_Analyzer
                             }
                         }
                     }
-                    return ErrorMsg(data);
+                    return messageController.FilterErrorMessage(data);
                 case "RODZAJ":
-                    Console.WriteLine("Podaj typ połączenia (National/Mobile/Local/Intl/PRS/Free)");
                     requestMsg = Console.ReadLine();                   
                     return data.Where(x => x.CallType == requestMsg).ToList();
                 case "OPLATA":
-                    Console.WriteLine("Podaj operator [< = >] + kwotę po spacji (np. > 500)");
                     requestMsg = Console.ReadLine();
                     string[] chargeLine = requestMsg.Split(' ');
                     if (chargeLine.Count() == 2)
@@ -126,16 +123,10 @@ namespace CDR_Analyzer
                                 return data.Where(x => x.CallCharge > chargeAmount).ToList();
                         }
                     }
-                    return ErrorMsg(data);
+                    return messageController.FilterErrorMessage(data);
                 default:
-                    return ErrorMsg(data);
+                    return messageController.FilterErrorMessage(data);
             }
-        }
-
-        List<ParserController.DataRow> ErrorMsg(List<ParserController.DataRow> data)
-        {
-            Console.WriteLine("Niepoprawne polecenie, dane nie zostały przefiltrowane");
-            return data;
         }
     }
 }

@@ -6,8 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer [Unreleased]
 
+## 0.0.4 - 2018-05-04
+### Dodane
+- Działanie programu w pętli, dopóki użytkownik sam go nie zamknie
+- Dodanie głównego menu
+- Możliwość resetowania danych z pliku
+- Możliwość zastosowania wielu filtrów
+
+### Zmodyfikowane
+- Sposób wyświetlania wiadomości, teraz w jednej klasie MessageController
+- Zarządzanie pamięcią po przefiltrowaniu danych (ograniczanie wielkości listy)
+
+
 ## 0.0.3 - 2018-05-02
-## Dodane
+### Dodane
 - Analiza danych CDR: filtrowanie na podstawie numerów telefonu, daty połączeń, rodzaju i ceny
 - Obsługa zapytań z wiersza poleceń
 
