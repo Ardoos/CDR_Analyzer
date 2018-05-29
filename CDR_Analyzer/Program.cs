@@ -17,7 +17,8 @@ namespace CDR_Analyzer
             var requestController = new RequestController();
             var messageController = new MessageController();
 
-            parserController.Parse();
+            parserController.SetFilePath("D:/Adrian Dokumenty/Studia/III rok/VI semestr/Techniki multimedialne/Projekt/CDR Generator by Paul Kinlan/Git/output.txt");
+            parserController.Parse(messageController);
 
             messageController.HelloMessage();
 
@@ -36,7 +37,7 @@ namespace CDR_Analyzer
  
                 if (keyPressed.Key == ConsoleKey.R)
                 {
-                    parserController.Parse();
+                    parserController.Parse(messageController);
                     messageController.ResetDataMessage(parserController.SavedDataRows.Count);
                 }
 

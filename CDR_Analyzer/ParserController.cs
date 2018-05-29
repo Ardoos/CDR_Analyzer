@@ -22,100 +22,162 @@ namespace CDR_Analyzer
 
         }
         public List<DataRow> SavedDataRows { get; set; } = new List<DataRow>();
-        string filePath = "D:/Adrian Dokumenty/Studia/III rok/VI semestr/Techniki multimedialne/Projekt/CDR Generator by Paul Kinlan/Git/output.txt";
-        public string SavedValue { get; set; }
+        string filePath;
+        private string errMessage;
+        private string parseMessage;
+        private string SavedValue { get; set; }
+        private int dataInLineNumber = 10;
   
-        public bool Parse()
+        public bool Parse(MessageController messageController)
         {
             SavedDataRows = new List<DataRow>();
 
-//            try
-//            {
+            try
+            {
                 string[] lines;
-                //if (!File.Exists(this.filePath))
-                //    return ErrorReturn("File does not exist.");
+                if (!File.Exists(this.filePath))
+                    return ErrorReturn("Plik nie istnieje", messageController);
 
                 lines = System.IO.File.ReadAllLines(this.filePath, Encoding.GetEncoding(949));
 
-                /*if (lines.Length < 1)
-                    throw new Exception("File is empty");
+                if (lines.Length < 1)
+                    throw new Exception("Plik jest pusty");
 
-                if (!ParseFilePath())
-                    return ErrorReturn("");
-
-                if (!ParseHeaderLine(lines[0]))
-                    return ErrorReturn("");
-
-                if (!modelName.Equals(fileModelName) || !lotName.Equals(fileLotName))
-                    return ErrorReturn("File name does not correspond with the model/lot number in the content.");*/
-
-                //this.dataList.Clear();
-
+                int i = 1;
                 foreach (string line in lines)
                 {
+                    bool parseError = false;
+                    parseMessage = "";
                     string[] valueLineParts = line.Split(',');
+
+                    if (valueLineParts.Length != dataInLineNumber)
+                    {
+                        messageController.ParseError(line, i, "\tNieprawidłowa ilość danych w linii");
+                        continue;
+                    }
+
                     if (!Int32.TryParse(valueLineParts[0], out int callId))
                     {
-                        callId = -1;
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowe id\n";
+                    }
+                    if (!IsNumeric(valueLineParts[1]))
+                    {
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowy numer dzwoniącego\n";
                     }
                     if (!Int32.TryParse(valueLineParts[2], out int callLine))
                     {
-                        callLine = -1;
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowy numer linii\n";
+                    }
+                    if (!IsNumeric(valueLineParts[3]))
+                    {
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowy numer odbierającego\n";
                     }
                     if (!DateTime.TryParse(valueLineParts[4], out DateTime dateStart))
                     {
-                        dateStart = new DateTime();
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowa data rozpoczęcia rozmowy\n";
                     }
                     if (DateTime.TryParse(valueLineParts[6], out DateTime timeStart))
                     {
                         dateStart = new DateTime(dateStart.Year, dateStart.Month, dateStart.Day, timeStart.Hour, timeStart.Minute, timeStart.Second);
                     }
+                    else
+                    {
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowy czas rozpoczęcia rozmowy\n";
+                    }
                     if (!DateTime.TryParse(valueLineParts[5], out DateTime dateEnd))
                     {
-                        dateEnd = new DateTime();
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowa data zakończenia rozmowy\n";
                     }
                     if (DateTime.TryParse(valueLineParts[7], out DateTime timeEnd))
                     {
                         dateEnd = new DateTime(dateEnd.Year, dateEnd.Month, dateEnd.Day, timeEnd.Hour, timeEnd.Minute, timeEnd.Second);
                     }
+                    else
+                    {
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowy czas zakończenia rozmowy\n";
+                    }
+
+                    if (valueLineParts[8] == "National" || valueLineParts[8] == "Mobile" || valueLineParts[8] == "Local" 
+                        || valueLineParts[8] == "Intl" || valueLineParts[8] == "PRS" || valueLineParts[8] == "Free")
+                    {} else
+                    {
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowy typ połączenia\n";
+                    }
                     if (!float.TryParse(valueLineParts[9], System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out float callCharge))//float.TryParse(valueLineParts[9], out float callCharge))
                     {
-                        callCharge = -1.0f;
+                        parseError = true;
+                        parseMessage += "\tNieprawidłowa opłata za połączenie\n";
                     }
-                    var newRecord = new DataRow()
-                    {
-                        CallId = callId,
-                        PhoneNumber = valueLineParts[1],
-                        CallLine = callLine,
-                        DestPhoneNumber = valueLineParts[3],
-                        CallStart = dateStart,
-                        CallEnd = dateEnd,
-                        CallType = valueLineParts[8],
-                        CallCharge = callCharge
-                    };
-                    SavedDataRows.Add(newRecord);
-                    /*if (valueLineParts.Length != POINT_COUNT + 7)
-                    {
-                        continue;
-                    }*/
 
-                    /*if (!ParseValueLine(line))
+                    if (!parseError)
                     {
-                        this.dataList.Clear();
-                        return ErrorReturn("");
-                    }*/
+                        var newRecord = new DataRow()
+                        {
+                            CallId = callId,
+                            PhoneNumber = valueLineParts[1],
+                            CallLine = callLine,
+                            DestPhoneNumber = valueLineParts[3],
+                            CallStart = dateStart,
+                            CallEnd = dateEnd,
+                            CallType = valueLineParts[8],
+                            CallCharge = callCharge
+                        };
+                        SavedDataRows.Add(newRecord);
+                    }
+                    else
+                    {
+                        messageController.ParseError(line, i, parseMessage);
+                    }
+                    i++;
                 }
 
-                //if (this.dataList.Count == 0)
-                 //   return ErrorReturn("No input data found.");
-
                 return true;
-            //}
-/*            catch (Exception e)
+            }
+            catch (Exception e)
             {
-                //return ErrorReturn("exception:" + e.Message);
+                return ErrorReturn("Wyjątek:" + e.Message, messageController);
+            }
+        }
+
+        private bool ErrorReturn(string message, MessageController messageController)
+        {
+            messageController.ParseError(message);
+            errMessage += message + " ";
+
+            ConsoleKeyInfo keyPressed = Console.ReadKey();
+
+            if (keyPressed.Key == ConsoleKey.T)
                 return false;
-            }*/
+            else
+                Environment.Exit(0);
+            return true;
+        }
+
+        public void SetFilePath(string path)
+        {
+            filePath = path;
+            errMessage = "";
+        }
+
+        public static bool IsNumeric(string s)
+        {
+            foreach (char c in s)
+            {
+                if (!char.IsDigit(c) && c != '.')
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

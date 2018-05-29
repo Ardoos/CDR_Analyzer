@@ -101,5 +101,19 @@ namespace CDR_Analyzer
         {
             Console.WriteLine("Wciśnij S, aby zapisać przefitlrowane dane");
         }
+        
+        public void ParseError(string errMessage)
+        {
+            Console.WriteLine(errMessage);
+            Console.WriteLine("Kliknij 'T', aby kontynuować wykonanie programu ");
+        }
+
+        public void ParseError(string line, int lineNumber, string parseMessage)
+        {
+            Console.WriteLine("Ta linia (" + lineNumber + ") nie zostanie dodana:");
+            Console.WriteLine("\t" + line);
+            Console.WriteLine("Ze względu na:");
+            Console.WriteLine(parseMessage);
+        }
     }
 }
