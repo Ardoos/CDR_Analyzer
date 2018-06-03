@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer [Unreleased]
 
+## 1.0.0 - 2018-06-03
+### Dodane
+- Dane przechowywane są na MongoDB - baza NoSQL
+- Klasa DB.cs odpowiedzialna za komunikację z bazą danych
+- Klasa CallRecord.cs, następca DataRow, klasa rekordu dopasowana do potrzeb MognoDB
+
+### Zmodyfikowane
+- Na starcie programu dane nie są wczytywane, chyba że baza jest pusta. Licznik ilości wczytanych rekordów podczas wczytywania
+- Zapytania zostały zmodyfikowane tak, aby poprawnie działały z bazą danych
+- Wyświetlanie danych strona po stronie
+- Statyczny MessageController
+
 ## 0.0.5 - 2018-05-29
 ### Zmodyfikowane
 - Wyświetlanie błądu w przypadku nieprawidłowych danych/złej liczby danych w linii

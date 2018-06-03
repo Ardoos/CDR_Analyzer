@@ -6,14 +6,23 @@ using System.Threading.Tasks;
 
 namespace CDR_Analyzer
 {
-    public class MessageController
+    public static class MessageController
     {
-        public void HelloMessage()
+        public static void HelloMessage()
         {
             Console.WriteLine("*** Witaj w programie analizującym pliki CDR ***");
         }
 
-        public void MainMenuMessage()
+        public static bool StartLoadData()
+        {
+            Console.WriteLine("Baza jest pusta, wciśnij \"T\", aby wczytać dane z domyślnego pliku");
+            ConsoleKeyInfo keyPressed = Console.ReadKey();
+            if (keyPressed.Key == ConsoleKey.T)
+                return true;
+            return false;
+        }
+
+        public static void MainMenuMessage()
         {
             Console.WriteLine("\nCo chcesz teraz zrobić?");
             Console.WriteLine("Wciśnij F, aby przefitrować dane");
@@ -22,25 +31,38 @@ namespace CDR_Analyzer
             Console.WriteLine("Wcisnić Esc, aby wyjść z programu");
         }
 
-        public void ResetDataMessage(int rowsCount)
+        public static void LoadingDataCurrentCount(long currentRecord, long allRecords)
+        {
+            Console.Write("\rTrwa wczytywanie danych, wczytano " + currentRecord + " z " + allRecords + " rekordów");
+        }
+
+        public static void ResetDataMessage(long rowsCount)
         {
             Console.WriteLine("\nDane zostały ponownie wczytane z pliku, liczba rekordów: " + rowsCount + "\n");
         }
 
-        public void ShowDataMessage(int rowsCount)
+        public static void ShowDataMessage(long rowsCount)
         {
-            Console.WriteLine("Liczba rekordów: " + rowsCount + ", wciśnij \"T\" aby je wyświetlić");
+            Console.WriteLine("\rLiczba rekordów: " + rowsCount);
         }
 
-        public void FilterDataMessage(int rowsCount)
+        public static bool FilterDataMessage(long rowsCount)
         {
             Console.WriteLine("\nDane zostały przefiltrowane, liczba rekordów: " + rowsCount + "\n");
+            Console.WriteLine("Wciśnij \"T\" aby wyświetlić dane");
+            ConsoleKeyInfo keyPressed = Console.ReadKey();
+
+            if (keyPressed.Key == ConsoleKey.T)
+                return true;
+            return false;
         }
 
-        public void ShowListRecords(List<ParserController.DataRow> data)
+        public static void ShowListRecords(List<CallRecord> data)
         {
+            int i = 0;
             foreach (var row in data)
             {
+                i++;
                 Console.WriteLine();
                 Console.Write(row.CallId + "   ");
                 Console.Write(row.PhoneNumber + "   ");
@@ -51,10 +73,22 @@ namespace CDR_Analyzer
                 Console.Write(row.CallType + "   ");
                 Console.Write(row.CallCharge);
                 Console.WriteLine();
+
+                if (i % Console.WindowHeight - 2 == 0)
+                {
+                    int rowsLeft = data.Count - i;
+                    Console.WriteLine("Enter, aby wczytać kolejne (pozostało " +  rowsLeft + ")");
+                    ConsoleKeyInfo keyPressed = Console.ReadKey();
+                    if (keyPressed.Key == ConsoleKey.Enter)
+                        continue;
+                    else
+                        break;
+                }
+                
             }
         }
 
-        public void FilterMenuMessage()
+        public static void FilterMenuMessage()
         {
             Console.WriteLine("*** Rodzaje filtrów ***");
             Console.WriteLine("- Numer telefonu dzwoniącego, wpisz: dzwoniacy");
@@ -66,7 +100,7 @@ namespace CDR_Analyzer
             Console.WriteLine("\nPo czym filtrujesz?");
         }
 
-        public void FilterInstructionMessage(string filterType)
+        public static void FilterInstructionMessage(string filterType)
         {
             switch (filterType)
             {
@@ -91,24 +125,23 @@ namespace CDR_Analyzer
             }
         }
 
-        public List<ParserController.DataRow> FilterErrorMessage(List<ParserController.DataRow> data)
+        public static void FilterErrorMessage()
         {
             Console.WriteLine("Niepoprawne polecenie, dane nie zostały przefiltrowane");
-            return data;
         }
 
-        public void SaveFilterMessage()
+        public static void SaveFilterMessage()
         {
             Console.WriteLine("Wciśnij S, aby zapisać przefitlrowane dane");
         }
         
-        public void ParseError(string errMessage)
+        public static void ParseError(string errMessage)
         {
             Console.WriteLine(errMessage);
             Console.WriteLine("Kliknij 'T', aby kontynuować wykonanie programu ");
         }
 
-        public void ParseError(string line, int lineNumber, string parseMessage)
+        public static void ParseError(string line, long lineNumber, string parseMessage)
         {
             Console.WriteLine("Ta linia (" + lineNumber + ") nie zostanie dodana:");
             Console.WriteLine("\t" + line);

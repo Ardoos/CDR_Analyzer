@@ -4,43 +4,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.Objects.SqlClient;
-
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace CDR_Analyzer
 {
     public class RequestController
     {      
-        public List<ParserController.DataRow> FilterRequests(List<ParserController.DataRow> data, MessageController messageController)
+        public void FilterRequests()
         {
-            messageController.FilterMenuMessage();
+            MessageController.FilterMenuMessage();
 
             string requestType = Console.ReadLine();
-            var filteredData = SingleRequest(requestType, data, messageController);
+            var filteredData = SingleRequest(requestType);
 
-            messageController.FilterDataMessage(filteredData.Count);
-
-            messageController.SaveFilterMessage();
-            ConsoleKeyInfo keyPressed = Console.ReadKey();
-
-            if (keyPressed.Key == ConsoleKey.S)
-                return filteredData;
-            else
-                return data;
+            if (MessageController.FilterDataMessage(filteredData.Count))
+                MessageController.ShowListRecords(filteredData);              
         }
 
-        List<ParserController.DataRow> SingleRequest(string requestType, List<ParserController.DataRow> data, MessageController messageController)
+        List<CallRecord> SingleRequest(string requestType)
         {
             string requestMsg = "";
             requestType = requestType.ToUpper();
-            messageController.FilterInstructionMessage(requestType);
+            MessageController.FilterInstructionMessage(requestType);
             switch (requestType)
             {               
                 case "DZWONIACY":
                     requestMsg = Console.ReadLine();
-                    return data.Where(x => x.PhoneNumber == requestMsg).ToList();
+                    return DB.CallRecords.Find(t => t.PhoneNumber == requestMsg).ToList();
                 case "ODBIERAJACY":
                     requestMsg = Console.ReadLine();
-                    return data.Where(x => x.DestPhoneNumber == requestMsg).ToList();
+                    return DB.CallRecords.Find(t => t.DestPhoneNumber == requestMsg).ToList();
                 case "ROZPOCZECIE":
                     requestMsg = Console.ReadLine();
                     string[] startDateLine = requestMsg.Split(' ');
@@ -51,11 +45,11 @@ namespace CDR_Analyzer
                             if(startDateLine.Count() == 2)
                             {
                                 if (startDateLine[0] == "<")
-                                    return data.Where(x => x.CallStart.Date < startDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallStart.Date < startDate).ToList();
                                 else if (startDateLine[0] == "=")
-                                    return data.Where(x => x.CallStart.Date == startDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallStart.Date == startDate).ToList();
                                 else if (startDateLine[0] == ">")
-                                    return data.Where(x => x.CallStart.Date > startDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallStart.Date > startDate).ToList();
                             }
                             else if(startDateLine.Count() == 3)
                             {
@@ -63,16 +57,17 @@ namespace CDR_Analyzer
                                 {
                                     startDate = new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, startTime.Second);
                                     if (startDateLine[0] == "<")
-                                        return data.Where(x => x.CallStart < startDate).ToList();
+                                        return DB.CallRecords.Find(t => t.CallStart < startDate).ToList();
                                     else if (startDateLine[0] == "=")
-                                        return data.Where(x => x.CallStart == startDate).ToList();
+                                        return DB.CallRecords.Find(t => t.CallStart == startDate).ToList();
                                     else if (startDateLine[0] == ">")
-                                        return data.Where(x => x.CallStart > startDate).ToList();
+                                        return DB.CallRecords.Find(t => t.CallStart > startDate).ToList();
                                 }
                             }
                         }
                     }
-                    return messageController.FilterErrorMessage(data);
+                    MessageController.FilterErrorMessage();
+                    return null;
                 case "ZAKONCZENIE":
                     requestMsg = Console.ReadLine();
                     string[] endDateLine = requestMsg.Split(' ');
@@ -83,11 +78,11 @@ namespace CDR_Analyzer
                             if (endDateLine.Count() == 2)
                             {
                                 if (endDateLine[0] == "<")
-                                    return data.Where(x => x.CallEnd.Date < endDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallEnd.Date < endDate).ToList();
                                 else if (endDateLine[0] == "=")
-                                    return data.Where(x => x.CallEnd.Date == endDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallEnd.Date == endDate).ToList();
                                 else if (endDateLine[0] == ">")
-                                    return data.Where(x => x.CallEnd.Date > endDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallEnd.Date > endDate).ToList();
                             }
                             else if (endDateLine.Count() == 3)
                             {
@@ -95,19 +90,20 @@ namespace CDR_Analyzer
                                 {
                                     endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, endTime.Second);
                                     if (endDateLine[0] == "<")
-                                        return data.Where(x => x.CallEnd < endDate).ToList();
+                                        return DB.CallRecords.Find(t => t.CallEnd < endDate).ToList();
                                     else if (endDateLine[0] == "=")
-                                        return data.Where(x => x.CallEnd == endDate).ToList();
+                                        return DB.CallRecords.Find(t => t.CallEnd == endDate).ToList();
                                     else if (endDateLine[0] == ">")
-                                        return data.Where(x => x.CallEnd > endDate).ToList();
+                                        return DB.CallRecords.Find(t => t.CallEnd > endDate).ToList();
                                 }
                             }
                         }
                     }
-                    return messageController.FilterErrorMessage(data);
+                    MessageController.FilterErrorMessage();
+                    return null;
                 case "RODZAJ":
-                    requestMsg = Console.ReadLine();                   
-                    return data.Where(x => x.CallType == requestMsg).ToList();
+                    requestMsg = Console.ReadLine();
+                    return DB.CallRecords.Find(t => t.CallType == requestMsg).ToList();
                 case "OPLATA":
                     requestMsg = Console.ReadLine();
                     string[] chargeLine = requestMsg.Split(' ');
@@ -116,16 +112,17 @@ namespace CDR_Analyzer
                         if (float.TryParse(chargeLine[1], System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out float chargeAmount))
                         {
                             if (chargeLine[0] == "<")
-                                return data.Where(x => x.CallCharge < chargeAmount).ToList();
+                                return DB.CallRecords.Find(t => t.CallCharge < chargeAmount).ToList();
                             else if (chargeLine[0] == "=")
-                                return data.Where(x => x.CallCharge == chargeAmount).ToList();
+                                return DB.CallRecords.Find(t => t.CallCharge == chargeAmount).ToList();
                             else if (chargeLine[0] == ">")
-                                return data.Where(x => x.CallCharge > chargeAmount).ToList();
+                                return DB.CallRecords.Find(t => t.CallCharge > chargeAmount).ToList();
                         }
                     }
-                    return messageController.FilterErrorMessage(data);
+                    MessageController.FilterErrorMessage();
+                    return null;
                 default:
-                    return messageController.FilterErrorMessage(data);
+                    return null;
             }
         }
     }

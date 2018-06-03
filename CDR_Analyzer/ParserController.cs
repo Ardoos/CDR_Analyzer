@@ -5,45 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace CDR_Analyzer
 {
     public class ParserController
     {
-        public class DataRow
-        {
-            public int CallId { get; set; }
-            public string PhoneNumber { get; set; }
-            public int CallLine { get; set; }
-            public string DestPhoneNumber { get; set; }
-            public DateTime CallStart { get; set; }
-            public DateTime CallEnd { get; set; }
-            public string CallType { get; set; }
-            public float CallCharge { get; set; }
-
-        }
-        public List<DataRow> SavedDataRows { get; set; } = new List<DataRow>();
         string filePath;
         private string errMessage;
         private string parseMessage;
         private string SavedValue { get; set; }
         private int dataInLineNumber = 10;
   
-        public bool Parse(MessageController messageController)
+        public bool Parse()
         {
-            SavedDataRows = new List<DataRow>();
-
             try
             {
                 string[] lines;
                 if (!File.Exists(this.filePath))
-                    return ErrorReturn("Plik nie istnieje", messageController);
+                    return ErrorReturn("Plik nie istnieje");
 
                 lines = System.IO.File.ReadAllLines(this.filePath, Encoding.GetEncoding(949));
 
                 if (lines.Length < 1)
                     throw new Exception("Plik jest pusty");
 
-                int i = 1;
+                long i = 1;
                 foreach (string line in lines)
                 {
                     bool parseError = false;
@@ -52,7 +38,7 @@ namespace CDR_Analyzer
 
                     if (valueLineParts.Length != dataInLineNumber)
                     {
-                        messageController.ParseError(line, i, "\tNieprawidłowa ilość danych w linii");
+                        MessageController.ParseError(line, i, "\tNieprawidłowa ilość danych w linii");
                         continue;
                     }
 
@@ -120,9 +106,8 @@ namespace CDR_Analyzer
 
                     if (!parseError)
                     {
-                        var newRecord = new DataRow()
+                        CallRecord record = new CallRecord()
                         {
-                            CallId = callId,
                             PhoneNumber = valueLineParts[1],
                             CallLine = callLine,
                             DestPhoneNumber = valueLineParts[3],
@@ -131,26 +116,28 @@ namespace CDR_Analyzer
                             CallType = valueLineParts[8],
                             CallCharge = callCharge
                         };
-                        SavedDataRows.Add(newRecord);
+                        DB.CallRecords.InsertOne(record);
+                        if (i % 1000 == 0)
+                            MessageController.LoadingDataCurrentCount(i, lines.Length);
                     }
                     else
                     {
-                        messageController.ParseError(line, i, parseMessage);
+                        MessageController.ParseError(line, i, parseMessage);
                     }
                     i++;
                 }
-
+                MessageController.LoadingDataCurrentCount(i-1, lines.Length);
                 return true;
             }
             catch (Exception e)
             {
-                return ErrorReturn("Wyjątek:" + e.Message, messageController);
+                return ErrorReturn("Wyjątek:" + e.Message);
             }
         }
 
-        private bool ErrorReturn(string message, MessageController messageController)
+        private bool ErrorReturn(string message)
         {
-            messageController.ParseError(message);
+            MessageController.ParseError(message);
             errMessage += message + " ";
 
             ConsoleKeyInfo keyPressed = Console.ReadKey();

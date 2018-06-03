@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
-
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace CDR_Analyzer
 {
@@ -15,44 +16,41 @@ namespace CDR_Analyzer
         {
             var parserController = new ParserController();
             var requestController = new RequestController();
-            var messageController = new MessageController();
 
-            parserController.SetFilePath("D:/Adrian Dokumenty/Studia/III rok/VI semestr/Techniki multimedialne/Projekt/CDR Generator by Paul Kinlan/Git/output.txt");
-            parserController.Parse(messageController);
+            parserController.SetFilePath("..\\..\\output.txt");
+            MessageController.HelloMessage();
 
-            messageController.HelloMessage();
-
+            if (DB.CallRecords.Count(new BsonDocument()) == 0)
+                if (MessageController.StartLoadData())
+                    parserController.Parse();
+         
             while (true)
             {
-                messageController.MainMenuMessage();
+                MessageController.MainMenuMessage();
                 ConsoleKeyInfo keyPressed = Console.ReadKey();
 
                 if (keyPressed.Key == ConsoleKey.F)
                 {
-                    var request = requestController.FilterRequests(parserController.SavedDataRows, messageController);
-                    parserController.SavedDataRows = request;
-                    parserController.SavedDataRows.TrimExcess();
-                    GC.Collect();
+                    //Filtruj
+                    requestController.FilterRequests();
                 }
  
                 if (keyPressed.Key == ConsoleKey.R)
                 {
-                    parserController.Parse(messageController);
-                    messageController.ResetDataMessage(parserController.SavedDataRows.Count);
+                    //Wczytaj dane ponownie
+                    DB.CallRecords.Database.DropCollection("CallRecords");
+                    parserController.Parse();
                 }
 
                 if (keyPressed.Key == ConsoleKey.W)
                 {
-                    messageController.ShowDataMessage(parserController.SavedDataRows.Count);
-                    keyPressed = Console.ReadKey();
-                    if (keyPressed.Key == ConsoleKey.T)
-                    {
-                        messageController.ShowListRecords(parserController.SavedDataRows);
-                    }
+                    //Pokaż informacje o danych
+                    MessageController.ShowDataMessage(DB.CallRecords.Count(new BsonDocument()));
                 }
                 
                 if(keyPressed.Key == ConsoleKey.Escape)
                 {
+                    //Wyjdź
                     Environment.Exit(0);
                 }
             }
