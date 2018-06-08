@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer [Unreleased]
 
+## 1.1.0 - 2018-06-08
+### Dodane
+- Wyświetlanie czasu, który potrzebny był na wykonanie zapytania do listy/bazy danych
+- Możliwość wyboru gdzie przechowywane będą dane (lista/baza danych)
+- Zapisywanie wyników zapytań do pliku
+- Możliwość wykonywania dalszych operacji na otrzymanym wyniku zapytania
+
+### Zmodyfikowane
+- Uproszczona obsługa interfejsu (wybieranie numerów zamiast wpisywania pełnych wyrazów zapytań)
+
+### Poprawione
+- Nieprawidłowe dane wprowadzone przez użytkownika nie powodują już zakończenia pracy aplikacji
+
 ## 1.0.0 - 2018-06-03
 ### Dodane
 - Dane przechowywane są na MongoDB - baza NoSQL

@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Globalization;
 
 
 namespace CDR_Analyzer
@@ -15,9 +17,11 @@ namespace CDR_Analyzer
         private string parseMessage;
         private string SavedValue { get; set; }
         private int dataInLineNumber = 10;
-  
+        public List<CallRecord> SavedDataRows { get; set; } = new List<CallRecord>();
+
         public bool Parse()
         {
+            SavedDataRows = new List<CallRecord>();
             try
             {
                 string[] lines;
@@ -30,6 +34,8 @@ namespace CDR_Analyzer
                     throw new Exception("Plik jest pusty");
 
                 long i = 1;
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
                 foreach (string line in lines)
                 {
                     bool parseError = false;
@@ -62,7 +68,7 @@ namespace CDR_Analyzer
                         parseError = true;
                         parseMessage += "\tNieprawidłowy numer odbierającego\n";
                     }
-                    if (!DateTime.TryParse(valueLineParts[4], out DateTime dateStart))
+                    if (!DateTime.TryParseExact(valueLineParts[4], "dd/MM/yyyy" , CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out DateTime dateStart))
                     {
                         parseError = true;
                         parseMessage += "\tNieprawidłowa data rozpoczęcia rozmowy\n";
@@ -76,7 +82,7 @@ namespace CDR_Analyzer
                         parseError = true;
                         parseMessage += "\tNieprawidłowy czas rozpoczęcia rozmowy\n";
                     }
-                    if (!DateTime.TryParse(valueLineParts[5], out DateTime dateEnd))
+                    if (!DateTime.TryParseExact(valueLineParts[5], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out DateTime dateEnd))
                     {
                         parseError = true;
                         parseMessage += "\tNieprawidłowa data zakończenia rozmowy\n";
@@ -98,7 +104,7 @@ namespace CDR_Analyzer
                         parseError = true;
                         parseMessage += "\tNieprawidłowy typ połączenia\n";
                     }
-                    if (!float.TryParse(valueLineParts[9], System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out float callCharge))//float.TryParse(valueLineParts[9], out float callCharge))
+                    if (!float.TryParse(valueLineParts[9], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out float callCharge))
                     {
                         parseError = true;
                         parseMessage += "\tNieprawidłowa opłata za połączenie\n";
@@ -116,7 +122,12 @@ namespace CDR_Analyzer
                             CallType = valueLineParts[8],
                             CallCharge = callCharge
                         };
-                        DB.CallRecords.InsertOne(record);
+
+                        if (DB.useDb)
+                            DB.CallRecords.InsertOne(record);
+                        else
+                            SavedDataRows.Add(record);
+
                         if (i % 1000 == 0)
                             MessageController.LoadingDataCurrentCount(i, lines.Length);
                     }
@@ -127,6 +138,8 @@ namespace CDR_Analyzer
                     i++;
                 }
                 MessageController.LoadingDataCurrentCount(i-1, lines.Length);
+                stopWatch.Stop();
+                MessageController.LoadingDataTime(stopWatch.Elapsed);
                 return true;
             }
             catch (Exception e)
