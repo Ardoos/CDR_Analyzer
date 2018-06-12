@@ -18,31 +18,35 @@ namespace CDR_Analyzer
 
             ConsoleKeyInfo request = Console.ReadKey();
             Stopwatch stopWatch = new Stopwatch();
-
-            var filteredData = SingleRequest(GetRequestType(request.Key), stopWatch);
+            bool correctRequest = true;
+            var filteredData = SingleRequest(GetRequestType(request.Key), stopWatch, out correctRequest);
             stopWatch.Stop();
-            if (MessageController.FilterDataMessage(filteredData.Count, stopWatch.Elapsed))
+            if (MessageController.FilterDataMessage(filteredData.Count, stopWatch.Elapsed, correctRequest))
                 MessageController.ShowListRecords(filteredData);
 
-            MessageController.SaveFilterMessage();
-            ConsoleKeyInfo keyPressed = Console.ReadKey();
-
-            if (keyPressed.Key == ConsoleKey.S)
-                SaveData.SaveToFile(filteredData);
-
-            MessageController.KeepFilteredData();
-            keyPressed = Console.ReadKey();
-            if (keyPressed.Key == ConsoleKey.T)
+            if(filteredData.Count > 0)
             {
-                DB.useDb = false;
-                return filteredData;
+                MessageController.SaveFilterMessage();
+                ConsoleKeyInfo keyPressed = Console.ReadKey();
+
+                if (keyPressed.Key == ConsoleKey.S)
+                    SaveData.SaveToFile(filteredData);
+
+                MessageController.KeepFilteredData();
+                keyPressed = Console.ReadKey();
+                if (keyPressed.Key == ConsoleKey.T)
+                {
+                    DB.useDb = false;
+                    return filteredData;
+                }
             }
 
             return new List<CallRecord>();
         }
 
-        List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch)
+        List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch, out bool correctRequest)
         {
+            correctRequest = true;
             string requestMsg = "";
             requestType = requestType.ToUpper();
             MessageController.FilterInstructionMessage(requestType);
@@ -50,10 +54,12 @@ namespace CDR_Analyzer
             {               
                 case "DZWONIACY":
                     requestMsg = Console.ReadLine();
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return DB.CallRecords.Find(t => t.PhoneNumber == requestMsg).ToList();
                 case "ODBIERAJACY":
                     requestMsg = Console.ReadLine();
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return DB.CallRecords.Find(t => t.DestPhoneNumber == requestMsg).ToList();
                 case "ROZPOCZECIE":
@@ -67,16 +73,19 @@ namespace CDR_Analyzer
                             {
                                 if (startDateLine[0] == "<")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return DB.CallRecords.Find(t => t.CallStart.Date < startDate).ToList();
                                 }
                                 else if (startDateLine[0] == "=")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return DB.CallRecords.Find(t => t.CallStart.Date == startDate).ToList();
                                 }
                                 else if (startDateLine[0] == ">")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return DB.CallRecords.Find(t => t.CallStart.Date > startDate).ToList();
                                 }
@@ -88,16 +97,19 @@ namespace CDR_Analyzer
                                     startDate = new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, startTime.Second);
                                     if (startDateLine[0] == "<")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return DB.CallRecords.Find(t => t.CallStart < startDate).ToList();
                                     }
                                     else if (startDateLine[0] == "=")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return DB.CallRecords.Find(t => t.CallStart == startDate).ToList();
                                     }
                                     else if (startDateLine[0] == ">")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return DB.CallRecords.Find(t => t.CallStart > startDate).ToList();
                                     }
@@ -119,16 +131,19 @@ namespace CDR_Analyzer
                             {
                                 if (endDateLine[0] == "<")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return DB.CallRecords.Find(t => t.CallEnd.Date < endDate).ToList();
                                 }
                                 else if (endDateLine[0] == "=")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return DB.CallRecords.Find(t => t.CallEnd.Date == endDate).ToList();
                                 }
                                 else if (endDateLine[0] == ">")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return DB.CallRecords.Find(t => t.CallEnd.Date > endDate).ToList();
                                 }
@@ -140,16 +155,19 @@ namespace CDR_Analyzer
                                     endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, endTime.Second);
                                     if (endDateLine[0] == "<")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return DB.CallRecords.Find(t => t.CallEnd < endDate).ToList();
                                     }
                                     else if (endDateLine[0] == "=")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return DB.CallRecords.Find(t => t.CallEnd == endDate).ToList();
                                     }
                                     else if (endDateLine[0] == ">")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return DB.CallRecords.Find(t => t.CallEnd > endDate).ToList();
                                     }
@@ -162,6 +180,7 @@ namespace CDR_Analyzer
                     return new List<CallRecord>();
                 case "RODZAJ":
                     ConsoleKeyInfo request = Console.ReadKey();
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return DB.CallRecords.Find(t => t.CallType == GetCallType(request.Key)).ToList();
                 case "OPLATA":
@@ -173,16 +192,19 @@ namespace CDR_Analyzer
                         {
                             if (chargeLine[0] == "<")
                             {
+                                MessageController.WaitForQuery();
                                 stopWatch.Start();
                                 return DB.CallRecords.Find(t => t.CallCharge < chargeAmount).ToList();
                             }
                             else if (chargeLine[0] == "=")
                             {
+                                MessageController.WaitForQuery();
                                 stopWatch.Start();
                                 return DB.CallRecords.Find(t => t.CallCharge == chargeAmount).ToList();
                             }
                             else if (chargeLine[0] == ">")
                             {
+                                MessageController.WaitForQuery();
                                 stopWatch.Start();
                                 return DB.CallRecords.Find(t => t.CallCharge > chargeAmount).ToList();
                             }
@@ -193,6 +215,7 @@ namespace CDR_Analyzer
                     return new List<CallRecord>();
                 default:
                     stopWatch.Start();
+                    correctRequest = false;
                     return new List<CallRecord>();
             }
         }
@@ -203,28 +226,32 @@ namespace CDR_Analyzer
 
             ConsoleKeyInfo request = Console.ReadKey();
             Stopwatch stopWatch = new Stopwatch();
+            bool correctRequest = true;
 
-            var filteredData = SingleRequest(GetRequestType(request.Key), stopWatch, data);
+            var filteredData = SingleRequest(GetRequestType(request.Key), stopWatch, out correctRequest);
             stopWatch.Stop();
-            if (MessageController.FilterDataMessage(filteredData.Count, stopWatch.Elapsed))
+            if (MessageController.FilterDataMessage(filteredData.Count, stopWatch.Elapsed, correctRequest))
                 MessageController.ShowListRecords(filteredData);
 
-            MessageController.SaveFilterMessage();
-            ConsoleKeyInfo keyPressed = Console.ReadKey();
+            if (filteredData.Count > 0)
+            {
+                MessageController.SaveFilterMessage();
+                ConsoleKeyInfo keyPressed = Console.ReadKey();
 
-            if (keyPressed.Key == ConsoleKey.S)
-                SaveData.SaveToFile(filteredData);
-
-            MessageController.KeepFilteredData();
-            keyPressed = Console.ReadKey();
-            if (keyPressed.Key == ConsoleKey.T)
-                return filteredData;
-            else
-                return data;
+                if (keyPressed.Key == ConsoleKey.S)
+                    SaveData.SaveToFile(filteredData);
+           
+                MessageController.KeepFilteredData();
+                keyPressed = Console.ReadKey();
+                if (keyPressed.Key == ConsoleKey.T)
+                    return filteredData;
+            }
+            return data;
         }
 
-        List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch, List<CallRecord> data)
+        List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch, List<CallRecord> data, bool correctRequest)
         {
+            correctRequest = true;
             string requestMsg = "";
             requestType = requestType.ToUpper();
             MessageController.FilterInstructionMessage(requestType);
@@ -232,10 +259,12 @@ namespace CDR_Analyzer
             {
                 case "DZWONIACY":
                     requestMsg = Console.ReadLine();
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return data.Where(x => x.PhoneNumber == requestMsg).ToList();
                 case "ODBIERAJACY":
                     requestMsg = Console.ReadLine();
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return data.Where(x => x.DestPhoneNumber == requestMsg).ToList();
                 case "ROZPOCZECIE":
@@ -249,16 +278,19 @@ namespace CDR_Analyzer
                             {
                                 if (startDateLine[0] == "<")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return data.Where(x => x.CallStart.Date < startDate).ToList();
                                 }
                                 else if (startDateLine[0] == "=")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return data.Where(x => x.CallStart.Date == startDate).ToList();
                                 }
                                 else if (startDateLine[0] == ">")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return data.Where(x => x.CallStart.Date > startDate).ToList();
                                 }
@@ -270,16 +302,19 @@ namespace CDR_Analyzer
                                     startDate = new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, startTime.Second);
                                     if (startDateLine[0] == "<")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return data.Where(x => x.CallStart < startDate).ToList();
                                     }
                                     else if (startDateLine[0] == "=")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return data.Where(x => x.CallStart == startDate).ToList();
                                     }
                                     else if (startDateLine[0] == ">")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return data.Where(x => x.CallStart > startDate).ToList();
                                     }
@@ -287,6 +322,7 @@ namespace CDR_Analyzer
                             }
                         }
                     }
+                    MessageController.WaitForQuery();
                     MessageController.FilterErrorMessage();
                     stopWatch.Start();
                     return data;
@@ -301,16 +337,19 @@ namespace CDR_Analyzer
                             {
                                 if (endDateLine[0] == "<")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return data.Where(x => x.CallEnd.Date < endDate).ToList();
                                 }
                                 else if (endDateLine[0] == "=")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return data.Where(x => x.CallEnd.Date == endDate).ToList();
                                 }
                                 else if (endDateLine[0] == ">")
                                 {
+                                    MessageController.WaitForQuery();
                                     stopWatch.Start();
                                     return data.Where(x => x.CallEnd.Date > endDate).ToList();
                                 }
@@ -322,16 +361,19 @@ namespace CDR_Analyzer
                                     endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, endTime.Second);
                                     if (endDateLine[0] == "<")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return data.Where(x => x.CallEnd < endDate).ToList();
                                     }
                                     else if (endDateLine[0] == "=")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return data.Where(x => x.CallEnd == endDate).ToList();
                                     }
                                     else if (endDateLine[0] == ">")
                                     {
+                                        MessageController.WaitForQuery();
                                         stopWatch.Start();
                                         return data.Where(x => x.CallEnd > endDate).ToList();
                                     }
@@ -339,11 +381,13 @@ namespace CDR_Analyzer
                             }
                         }
                     }
+                    MessageController.WaitForQuery();
                     MessageController.FilterErrorMessage();
                     stopWatch.Start();
                     return data;
                 case "RODZAJ":
                     ConsoleKeyInfo request = Console.ReadKey();
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return data.Where(x => x.CallType == GetCallType(request.Key)).ToList();
                 case "OPLATA":
@@ -355,25 +399,31 @@ namespace CDR_Analyzer
                         {
                             if (chargeLine[0] == "<")
                             {
+                                MessageController.WaitForQuery();
                                 stopWatch.Start();
                                 return data.Where(x => x.CallCharge < chargeAmount).ToList();
                             }
                             else if (chargeLine[0] == "=")
                             {
+                                MessageController.WaitForQuery();
                                 stopWatch.Start();
                                 return data.Where(x => x.CallCharge == chargeAmount).ToList();
                             }
                             else if (chargeLine[0] == ">")
                             {
+                                MessageController.WaitForQuery();
                                 stopWatch.Start();
                                 return data.Where(x => x.CallCharge > chargeAmount).ToList();
                             }
                         }
                     }
+                    MessageController.WaitForQuery();
                     MessageController.FilterErrorMessage();
                     stopWatch.Start();
                     return data;
                 default:
+                    correctRequest = false;
+                    MessageController.WaitForQuery();
                     stopWatch.Start();
                     return data;
             }

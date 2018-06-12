@@ -12,10 +12,14 @@ namespace CDR_Analyzer
         {
             Console.WriteLine("*** Witaj w programie analizującym pliki CDR ***");
             Console.WriteLine("Domyślnie program do przechowywania danych wykorzystuje bazę MongoDb");
-            Console.WriteLine("Wcisnij [L], aby przełączyć się na korzystanie z listy");
+            Console.WriteLine("Wciśnij \"L\", aby przełączyć się na korzystanie z listy");
             ConsoleKeyInfo keyPressed = Console.ReadKey();
             if (keyPressed.Key == ConsoleKey.L)
+            {
+                Console.WriteLine("\rWybrałeś operowanie na listach");
                 return false;
+            }
+            Console.WriteLine("\rWybrałeś operowanie na bazie danych");
             return true;
         }
 
@@ -31,10 +35,10 @@ namespace CDR_Analyzer
         public static void MainMenuMessage()
         {
             Console.WriteLine("\nCo chcesz teraz zrobić?");
-            Console.WriteLine("Wciśnij F, aby przefitrować dane");
-            Console.WriteLine("Wciśnij W, aby wyświetlić obecne informacje o aktualnych danych");
-            Console.WriteLine("Wciśnij R, aby ponownie wczytać dane z pliku");
-            Console.WriteLine("Wcisnić Esc, aby wyjść z programu");
+            Console.WriteLine("Wciśnij \"F\", aby przefitrować dane");
+            Console.WriteLine("Wciśnij \"W\", aby wyświetlić obecne informacje aktualnych danych i ich źródle");
+            Console.WriteLine("Wciśnij \"R\", aby ponownie wczytać dane z pliku");
+            Console.WriteLine("WcisniJ \"Esc\", aby wyjść z programu");
         }
 
         public static void LoadingDataCurrentCount(long currentRecord, long allRecords)
@@ -54,19 +58,42 @@ namespace CDR_Analyzer
 
         public static void ShowDataMessage(long rowsCount)
         {
-            Console.WriteLine("\rLiczba rekordów: " + rowsCount);
+            if (DB.useDb)
+                Console.Write("\rAktualnie pracujesz na bazie danych, ");
+            else
+                Console.Write("\rAktualnie pracujesz na listach, ");
+            Console.WriteLine("liczba rekordów: " + rowsCount);
+
+            Console.WriteLine("Wciśnij \"S\" w celu przełączenia źródła danych lub dowolny przycisk, aby pozostać przy aktualnym");
+            ConsoleKeyInfo keyPressed = Console.ReadKey();
+            if (keyPressed.Key == ConsoleKey.S)
+            {
+                DB.useDb = !DB.useDb;
+                Console.Write("\rPrzełączyłeś się na ");
+                if (DB.useDb)
+                    Console.Write("bazę danych");
+                else
+                    Console.Write("listę\n");
+            }
         }
 
-        public static bool FilterDataMessage(long rowsCount, TimeSpan queryTime)
+        public static bool FilterDataMessage(long rowsCount, TimeSpan queryTime, bool correctRequest)
         {
-            Console.WriteLine("\nDane zostały przefiltrowane (w czasie " + FormatRequestTime(queryTime) + "), liczba rekordów: " + rowsCount + "\n");
-            if (rowsCount != 0)
+            if (correctRequest)
             {
-                Console.WriteLine("Wciśnij \"T\" aby wyświetlić dane");
-                ConsoleKeyInfo keyPressed = Console.ReadKey();
+                Console.WriteLine("\nDane zostały przefiltrowane (w czasie " + FormatRequestTime(queryTime) + "), liczba rekordów: " + rowsCount + "\n");
+                if (rowsCount != 0)
+                {
+                    Console.WriteLine("Wciśnij \"T\" aby wyświetlić dane");
+                    ConsoleKeyInfo keyPressed = Console.ReadKey();
 
-                if (keyPressed.Key == ConsoleKey.T)
-                    return true;
+                    if (keyPressed.Key == ConsoleKey.T)
+                        return true;
+                }
+            }
+            else
+            {
+                Console.WriteLine("\rNieprawidłowe zapytanie");
             }
             return false;
         }
@@ -91,7 +118,7 @@ namespace CDR_Analyzer
                 if (i % Console.WindowHeight - 2 == 0)
                 {
                     int rowsLeft = data.Count - i;
-                    Console.WriteLine("Enter, aby wczytać kolejne (pozostało " +  rowsLeft + ")");
+                    Console.WriteLine("\"Enter\", aby wczytać kolejne (pozostało " +  rowsLeft + ")");
                     ConsoleKeyInfo keyPressed = Console.ReadKey();
                     if (keyPressed.Key == ConsoleKey.Enter)
                         continue;
@@ -104,13 +131,13 @@ namespace CDR_Analyzer
 
         public static void FilterMenuMessage()
         {
-            Console.WriteLine("*** Rodzaje filtrów ***");
-            Console.WriteLine("[1] Numer telefonu dzwoniącego");
-            Console.WriteLine("[2] Numer telefonu odbierającego");
-            Console.WriteLine("[3] Data rozpoczęcia połączenia");
-            Console.WriteLine("[4] Data zakończenia połączenia");
-            Console.WriteLine("[5] Rodzaj połączenia");
-            Console.WriteLine("[6] Opłata za połączenie");
+            Console.WriteLine("\r*** Rodzaje filtrów ***");
+            Console.WriteLine("\"1\" Numer telefonu dzwoniącego");
+            Console.WriteLine("\"2\" Numer telefonu odbierającego");
+            Console.WriteLine("\"3\" Data rozpoczęcia połączenia");
+            Console.WriteLine("\"4\" Data zakończenia połączenia");
+            Console.WriteLine("\"5\" Rodzaj połączenia");
+            Console.WriteLine("\"6\" Opłata za połączenie");
             Console.WriteLine("\nPo czym filtrujesz?");
         }
 
@@ -125,10 +152,10 @@ namespace CDR_Analyzer
                     Console.WriteLine("\rPodaj numer odbierającego telefonu");
                     break;
                 case "ROZPOCZECIE":
-                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/mm/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
+                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/MM/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
                     break;
                 case "ZAKONCZENIE":
-                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/mm/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
+                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/MM/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
                     break;
                 case "RODZAJ":
                     Console.WriteLine("\rPodaj typ połączenia [1] National | [2] Mobile | [3] Local | [4] Intl | [5] PRS | [6] Free");
@@ -144,20 +171,25 @@ namespace CDR_Analyzer
             Console.WriteLine("Niepoprawne polecenie, dane nie zostały przefiltrowane");
         }
 
+        public static void WaitForQuery()
+        {
+            Console.WriteLine("Trwa wykonywanie zapytania, proszę czekać...");
+        }
+
         public static void SaveFilterMessage()
         {
-            Console.WriteLine("Wciśnij S, aby zapisać przefiltrowane dane do pliku");
+            Console.WriteLine("\rWciśnij \"S\", aby zapisać przefiltrowane dane do pliku");
         }
         
         public static void KeepFilteredData()
         {
-            Console.WriteLine("Wciśnij T, aby nadal pracować na przefiltrowanych danych?");
+            Console.WriteLine("\rWciśnij \"T\", aby nadal pracować na przefiltrowanych danych?");
         }
 
         public static void ParseError(string errMessage)
         {
             Console.WriteLine(errMessage);
-            Console.WriteLine("Kliknij 'T', aby kontynuować wykonanie programu ");
+            Console.WriteLine("Wciśnij \"T\", aby kontynuować wykonanie programu ");
         }
 
         public static void ParseError(string line, long lineNumber, string parseMessage)

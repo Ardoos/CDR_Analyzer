@@ -20,8 +20,6 @@ namespace CDR_Analyzer
                 lines.Add(line);
             }
             
-            // WriteAllLines creates a file, writes a collection of strings to the file,
-            // and then closes the file.  You do NOT need to call Flush() or Close().
             System.IO.File.WriteAllLines("..\\..\\filtered.txt", lines);
         }
     }

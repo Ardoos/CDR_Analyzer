@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer [Unreleased]
 
+## 1.1.1 - 2018-06-13
+### Dodane
+- Możliwość przełączenia listy/bazy danych w czasie pracy programu
+- Wyświetlanie komunikatów w przypadku wybraniu nieprawidłowych opcji
+- Dodawanie rekordów do bazy danych co określoną liczbę rekordów, nie pojedyczno
+- Komunikaty o oczekiwaniu, potrzebne szczególnie w przypadku przetwarzania dużych ilości danych
+
+### Poprawione
+- Spójność komunikatów przekazywanych użytkownikowi
+
 ## 1.1.0 - 2018-06-08
 ### Dodane
 - Wyświetlanie czasu, który potrzebny był na wykonanie zapytania do listy/bazy danych

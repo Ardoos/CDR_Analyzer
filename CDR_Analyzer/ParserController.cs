@@ -25,6 +25,7 @@ namespace CDR_Analyzer
             try
             {
                 string[] lines;
+                List<CallRecord> TempDbRows = new List<CallRecord>();
                 if (!File.Exists(this.filePath))
                     return ErrorReturn("Plik nie istnieje");
 
@@ -124,7 +125,15 @@ namespace CDR_Analyzer
                         };
 
                         if (DB.useDb)
-                            DB.CallRecords.InsertOne(record);
+                        {
+                            if (i % 2000 == 0)
+                            {
+                                DB.CallRecords.InsertMany(TempDbRows);
+                                TempDbRows = new List<CallRecord>();
+                            }
+                            else
+                                TempDbRows.Add(record);
+                        }
                         else
                             SavedDataRows.Add(record);
 
