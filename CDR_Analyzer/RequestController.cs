@@ -56,12 +56,17 @@ namespace CDR_Analyzer
                     requestMsg = Console.ReadLine();
                     MessageController.WaitForQuery();
                     stopWatch.Start();
-                    return DB.CallRecords.Find(t => t.PhoneNumber == requestMsg).ToList();
+                    if(IsPhoneNumber(requestMsg))
+                        return DB.CallRecords.Find(t => t.PhoneNumber == requestMsg).ToList();
+                    return new List<CallRecord>();
+
                 case "ODBIERAJACY":
                     requestMsg = Console.ReadLine();
                     MessageController.WaitForQuery();
                     stopWatch.Start();
-                    return DB.CallRecords.Find(t => t.DestPhoneNumber == requestMsg).ToList();
+                    if(IsPhoneNumber(requestMsg))
+                        return DB.CallRecords.Find(t => t.DestPhoneNumber == requestMsg).ToList();
+                    return new List<CallRecord>();
                 case "ROZPOCZECIE":
                     requestMsg = Console.ReadLine();
                     string[] startDateLine = requestMsg.Split(' ');
@@ -182,7 +187,9 @@ namespace CDR_Analyzer
                     ConsoleKeyInfo request = Console.ReadKey();
                     MessageController.WaitForQuery();
                     stopWatch.Start();
-                    return DB.CallRecords.Find(t => t.CallType == GetCallType(request.Key)).ToList();
+                    if(GetCallType(request.Key) != "")
+                        return DB.CallRecords.Find(t => t.CallType == GetCallType(request.Key)).ToList();
+                    return new List<CallRecord>();
                 case "OPLATA":
                     requestMsg = Console.ReadLine();
                     string[] chargeLine = requestMsg.Split(' ');
@@ -261,12 +268,16 @@ namespace CDR_Analyzer
                     requestMsg = Console.ReadLine();
                     MessageController.WaitForQuery();
                     stopWatch.Start();
-                    return data.Where(x => x.PhoneNumber == requestMsg).ToList();
+                    if(IsPhoneNumber(requestMsg))
+                        return data.Where(x => x.PhoneNumber == requestMsg).ToList();
+                    return data;
                 case "ODBIERAJACY":
                     requestMsg = Console.ReadLine();
                     MessageController.WaitForQuery();
                     stopWatch.Start();
-                    return data.Where(x => x.DestPhoneNumber == requestMsg).ToList();
+                    if (IsPhoneNumber(requestMsg))
+                        return data.Where(x => x.DestPhoneNumber == requestMsg).ToList();
+                    return data;
                 case "ROZPOCZECIE":
                     requestMsg = Console.ReadLine();
                     string[] startDateLine = requestMsg.Split(' ');
@@ -389,7 +400,9 @@ namespace CDR_Analyzer
                     ConsoleKeyInfo request = Console.ReadKey();
                     MessageController.WaitForQuery();
                     stopWatch.Start();
-                    return data.Where(x => x.CallType == GetCallType(request.Key)).ToList();
+                    if (GetCallType(request.Key) != "")
+                        return data.Where(x => x.CallType == GetCallType(request.Key)).ToList();
+                    return data;
                 case "OPLATA":
                     requestMsg = Console.ReadLine();
                     string[] chargeLine = requestMsg.Split(' ');
@@ -461,6 +474,21 @@ namespace CDR_Analyzer
             else if (request == ConsoleKey.D6 || request == ConsoleKey.NumPad6)
                 return "Free";
             return "";
+        }
+
+        private bool IsPhoneNumber(string s)
+        {
+            foreach (char c in s)
+            {
+                if (!char.IsDigit(c) && c != '.')
+                {
+
+                    return false;
+                }
+            }
+            if(s.Length == 11) // Numery telefonów są 11 cyfrowe
+                return true;
+            return false;
         }
     }
 }

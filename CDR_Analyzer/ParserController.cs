@@ -177,7 +177,7 @@ namespace CDR_Analyzer
             errMessage = "";
         }
 
-        public static bool IsNumeric(string s)
+        private bool IsNumeric(string s)
         {
             foreach (char c in s)
             {

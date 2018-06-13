@@ -17,7 +17,7 @@ namespace CDR_Analyzer
             var parserController = new ParserController();
             var requestController = new RequestController();
 
-            parserController.SetFilePath("..\\..\\cdr_big.txt");
+            parserController.SetFilePath("..\\..\\cdr_small.txt");
             DB.useDb = MessageController.HelloMessage();
 
             if (DB.useDb)

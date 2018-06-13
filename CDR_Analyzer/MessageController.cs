@@ -152,10 +152,10 @@ namespace CDR_Analyzer
                     Console.WriteLine("\rPodaj numer odbierającego telefonu");
                     break;
                 case "ROZPOCZECIE":
-                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/MM/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
+                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/MM/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2017 18:00)");
                     break;
                 case "ZAKONCZENIE":
-                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/MM/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. > 11/01/2014 18:00)");
+                    Console.WriteLine("\rPodaj operator [< = >], datę [dd/MM/yyyy], opcjonalnie czas [hh:mm:(ss)] (np. < 14/02/2017 16:00)");
                     break;
                 case "RODZAJ":
                     Console.WriteLine("\rPodaj typ połączenia [1] National | [2] Mobile | [3] Local | [4] Intl | [5] PRS | [6] Free");

@@ -19,7 +19,6 @@ namespace CDR_Analyzer
                     x.CallEnd.Date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) + "," + x.CallStart.TimeOfDay + "," + x.CallEnd.TimeOfDay + "," + x.CallType + "," + x.CallCharge.ToString(".0", CultureInfo.InvariantCulture);
                 lines.Add(line);
             }
-            
             System.IO.File.WriteAllLines("..\\..\\filtered.txt", lines);
         }
     }
