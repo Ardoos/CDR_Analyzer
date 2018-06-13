@@ -7,8 +7,15 @@ using System.Globalization;
 
 namespace CDR_Analyzer
 {
+    /// <summary>
+    /// Klasa obsługująca zapis danych do pliku tekstowego
+    /// </summary>
     public static class SaveData
     {
+        /// <summary>
+        /// Metoda zapisująca dane do pliku tekstowego
+        /// </summary>
+        /// <param name="data">Dane do zapisu</param>
         public static void SaveToFile(List<CallRecord> data)
         {
             List<string> lines = new List<string>();

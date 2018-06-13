@@ -10,8 +10,15 @@ using MongoDB.Driver;
 
 namespace CDR_Analyzer
 {
+    /// <summary>
+    /// Klasa obsługująca zapytania dotyczące filtrowania danych
+    /// </summary>
     public class RequestController
     {
+        /// <summary>
+        /// Metoda wywołująca filtrowanie danych dla bazy danych MongoDB
+        /// </summary>
+        /// <returns>Listę przefiltrowanych danych</returns>
         public List<CallRecord> FilterRequests()
         {
             MessageController.FilterMenuMessage();
@@ -44,6 +51,13 @@ namespace CDR_Analyzer
             return new List<CallRecord>();
         }
 
+        /// <summary>
+        /// Obsługuje pojedyncze zapytanie do bazy danych
+        /// </summary>
+        /// <param name="requestType">Typ zapytania</param>
+        /// <param name="stopWatch">Stoper odmierzający czas zapytania</param>
+        /// <param name="correctRequest">Określa czy zapytanie było prawidłowe</param>
+        /// <returns>Listę przefiltrowanych danych</returns>
         List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch, out bool correctRequest)
         {
             correctRequest = true;
@@ -80,19 +94,19 @@ namespace CDR_Analyzer
                                 {
                                     MessageController.WaitForQuery();
                                     stopWatch.Start();
-                                    return DB.CallRecords.Find(t => t.CallStart.Date < startDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallStart < startDate).ToList();
                                 }
                                 else if (startDateLine[0] == "=")
                                 {
                                     MessageController.WaitForQuery();
                                     stopWatch.Start();
-                                    return DB.CallRecords.Find(t => t.CallStart.Date == startDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallStart == startDate).ToList();
                                 }
                                 else if (startDateLine[0] == ">")
                                 {
                                     MessageController.WaitForQuery();
                                     stopWatch.Start();
-                                    return DB.CallRecords.Find(t => t.CallStart.Date > startDate).ToList();
+                                    return DB.CallRecords.Find(t => t.CallStart > startDate).ToList();
                                 }
                             }
                             else if(startDateLine.Count() == 3)
@@ -227,6 +241,10 @@ namespace CDR_Analyzer
             }
         }
 
+        /// Metoda wywołująca filtrowanie danych dla listy
+        /// </summary>
+        /// <param name="data">Lista z danymi wejściowymi</param>
+        /// <returns>Listę z przefiltrowanymi danymi</returns>
         public List<CallRecord> FilterRequests(List<CallRecord> data)
         {
             MessageController.FilterMenuMessage();
@@ -235,7 +253,7 @@ namespace CDR_Analyzer
             Stopwatch stopWatch = new Stopwatch();
             bool correctRequest = true;
 
-            var filteredData = SingleRequest(GetRequestType(request.Key), stopWatch, out correctRequest);
+            var filteredData = SingleRequest(GetRequestType(request.Key), stopWatch, data, out correctRequest);
             stopWatch.Stop();
             if (MessageController.FilterDataMessage(filteredData.Count, stopWatch.Elapsed, correctRequest))
                 MessageController.ShowListRecords(filteredData);
@@ -256,7 +274,15 @@ namespace CDR_Analyzer
             return data;
         }
 
-        List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch, List<CallRecord> data, bool correctRequest)
+        /// <summary>
+        /// Obsługuje pojedyncze zapytanie do listy
+        /// </summary>
+        /// <param name="requestType">Typ zapytania</param>
+        /// <param name="stopWatch">Stoper odmierzający czas zapytania</param>
+        /// <param name="data">Lista z danymi wejściowymi</param>
+        /// <param name="correctRequest">Określa czy zapytanie było prawidłowe</param>
+        /// <returns>Listę przefiltrowanych danych</returns>
+        List<CallRecord> SingleRequest(string requestType, Stopwatch stopWatch, List<CallRecord> data, out bool correctRequest)
         {
             correctRequest = true;
             string requestMsg = "";
@@ -442,6 +468,11 @@ namespace CDR_Analyzer
             }
         }
 
+        /// <summary>
+        /// Metoda sprawdzająca jakie należy wykonać zapytanie
+        /// </summary>
+        /// <param name="request">Przycisk wciśnięty przez użytkownika</param>
+        /// <returns>Typ zapytania</returns>
         private string GetRequestType(ConsoleKey request)
         {
             if (request == ConsoleKey.D1 || request == ConsoleKey.NumPad1)
@@ -459,6 +490,11 @@ namespace CDR_Analyzer
             return "";
         }
 
+        /// <summary>
+        /// Metoda sprawdzająca o jaki typ połączenia pyta użytkownik
+        /// </summary>
+        /// <param name="request">Przycisk wciśnięty przez użytkownika</param>
+        /// <returns>Typ połączenia</returns>
         private string GetCallType(ConsoleKey request)
         {
             if (request == ConsoleKey.D1 || request == ConsoleKey.NumPad1)
@@ -476,6 +512,11 @@ namespace CDR_Analyzer
             return "";
         }
 
+        /// <summary>
+        /// Metoda sprawdzająca czy podany numer telefonu jest prawidłowy
+        /// </summary>
+        /// <param name="s">Podany numer telefonu</param>
+        /// <returns>True jeśli numer telefonu prawidłowy, inaczej false</returns>
         private bool IsPhoneNumber(string s)
         {
             foreach (char c in s)
@@ -486,7 +527,7 @@ namespace CDR_Analyzer
                     return false;
                 }
             }
-            if(s.Length == 11) // Numery telefonów są 11 cyfrowe
+            if(s.Length == 11) // Numery telefonów w wygenerowanych danych są 11 cyfrowe
                 return true;
             return false;
         }

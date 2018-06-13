@@ -10,15 +10,26 @@ using System.Globalization;
 
 namespace CDR_Analyzer
 {
+    /// <summary>
+    /// Klasa obsługująca parsowanie danych
+    /// </summary>
     public class ParserController
     {
+        /// <summary> Ścieżka do parsowanego pliku </summary>
         string filePath;
+        /// <summary> Wiadomość o błędzie </summary>
         private string errMessage;
+        /// <summary> Wiadomość o błędzie podczas parsowania </summary>
         private string parseMessage;
-        private string SavedValue { get; set; }
+        /// <summary> Docelowa liczba atrybutów jednego wpisu </summary>
         private int dataInLineNumber = 10;
+        /// <summary> Lista odczytanych linii </summary>
         public List<CallRecord> SavedDataRows { get; set; } = new List<CallRecord>();
 
+        /// <summary>
+        /// Parsuje dane z pliku
+        /// </summary>
+        /// <returns>True w przypadku poprawnego parsowania, inaczej false</returns>
         public bool Parse()
         {
             SavedDataRows = new List<CallRecord>();
@@ -157,6 +168,11 @@ namespace CDR_Analyzer
             }
         }
 
+        /// <summary>
+        /// Wyświetla wiadomość o błędzie i oczekuje na podjęcie dalszych akcji użytkownika
+        /// </summary>
+        /// <param name="message">Wiadomość o błędzie</param>
+        /// <returns>False jeśli działanie programu ma być kontynuowane, inaczej true</returns>
         private bool ErrorReturn(string message)
         {
             MessageController.ParseError(message);
@@ -171,12 +187,21 @@ namespace CDR_Analyzer
             return true;
         }
 
+        /// <summary>
+        /// Ustawia ścieżkę do pliku z danymi
+        /// </summary>
+        /// <param name="path">Ścieżka do pliku</param>
         public void SetFilePath(string path)
         {
             filePath = path;
             errMessage = "";
         }
 
+        /// <summary>
+        /// Sprawdza czy podany łańcuch znakowy składa się z cyfr
+        /// </summary>
+        /// <param name="s">Łańcuch znakowy</param>
+        /// <returns>True jeśli składa się tylko z cyfr, inaczej false</returns>
         private bool IsNumeric(string s)
         {
             foreach (char c in s)

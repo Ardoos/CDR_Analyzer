@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer
 
+## 1.1.4 - 2018-06-14
+### Dodane
+ - Komentarze do wygenerowania dokumentacji
+
+### Poprawione
+- Błędy związane z filtrowaniem wiadomości na listach
+- Błąd filtrowania daty na bazie danych
+
 ## 1.1.3 - 2018-06-14
 ### Poprawione
  - Formatowanie w pliku README.md

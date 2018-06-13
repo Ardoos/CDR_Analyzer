@@ -10,14 +10,22 @@ using MongoDB.Bson;
 
 namespace CDR_Analyzer
 {
+    /// <summary>
+    /// Główna klasa programu w której znajduje się metoda main
+    /// </summary>
     class Program
     {
+        /// <summary>
+        /// Główna metoda programu, uruchamia się jako pierwsza
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             var parserController = new ParserController();
             var requestController = new RequestController();
 
-            parserController.SetFilePath("..\\..\\cdr_small.txt");
+            parserController.SetFilePath("..\\..\\cdr_small.txt"); // ścieżka względna
+            //parserController.SetFilePath("D:\\Adrian Dokumenty\\Studia\\III rok\\VI semestr\\Techniki multimedialne\\Projekt\\cdr_big.txt"); // ścieżka bezwzględna
             DB.useDb = MessageController.HelloMessage();
 
             if (DB.useDb)

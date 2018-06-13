@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace CDR_Analyzer
 {
+    /// <summary>
+    /// Statyczna klasa zawierająca metody służące do wyświetlania informacji i komend dla użytkownika
+    /// </summary>
     public static class MessageController
     {
+        /// <summary>
+        /// Wiadomość powitalna służąca do wybrania na czym pracował będzie program
+        /// </summary>
+        /// <returns>True w przypadku wybrania bazy danych, false w przypadku wybrania list</returns>
         public static bool HelloMessage()
         {
             Console.WriteLine("*** Witaj w programie analizującym pliki CDR ***");
@@ -23,6 +30,10 @@ namespace CDR_Analyzer
             return true;
         }
 
+        /// <summary>
+        /// Umożliwia wczytanie danych do bazy w przypadku gdy jest pusta
+        /// </summary>
+        /// <returns>True w przypadku naciśnięcia poprawnego klawisza, inaczej false</returns>
         public static bool StartLoadData()
         {
             Console.WriteLine("Baza jest pusta, wciśnij \"T\", aby wczytać dane z domyślnego pliku");
@@ -32,6 +43,9 @@ namespace CDR_Analyzer
             return false;
         }
 
+        /// <summary>
+        /// Wyświetla menu główne programu
+        /// </summary>
         public static void MainMenuMessage()
         {
             Console.WriteLine("\nCo chcesz teraz zrobić?");
@@ -41,21 +55,38 @@ namespace CDR_Analyzer
             Console.WriteLine("WcisniJ \"Esc\", aby wyjść z programu");
         }
 
+        /// <summary>
+        /// Wyświetla informację o postępie wczytywania danych
+        /// </summary>
+        /// <param name="currentRecord">Obecnie wczytywany rekord</param>
+        /// <param name="allRecords">Liczba wszystkich rekordów</param>
         public static void LoadingDataCurrentCount(long currentRecord, long allRecords)
         {
             Console.Write("\rTrwa wczytywanie danych, wczytano " + currentRecord + " z " + allRecords + " rekordów");
         }
 
+        /// <summary>
+        /// Wyświetla informację o czasie potrzebnym do wczytania danych
+        /// </summary>
+        /// <param name="loadingTime">Czas wczytania danych</param>
         public static void LoadingDataTime(TimeSpan loadingTime)
         {
             Console.WriteLine("\nWczytanie danych zajęło " + FormatRequestTime(loadingTime));
         }
 
+        /// <summary>
+        /// Wyświetla informację podsumowującą ponowne wczytanie danych
+        /// </summary>
+        /// <param name="rowsCount">Liczcba wczytanych rekordów</param>
         public static void ResetDataMessage(long rowsCount)
         {
             Console.WriteLine("\nDane zostały ponownie wczytane z pliku, liczba rekordów: " + rowsCount + "\n");
         }
 
+        /// <summary>
+        /// Pokazuje informacje o aktualnie używanych danych, umożliwia przełączenie się na bazę danych/listę
+        /// </summary>
+        /// <param name="rowsCount">Liczba rekordów</param>
         public static void ShowDataMessage(long rowsCount)
         {
             if (DB.useDb)
@@ -77,6 +108,13 @@ namespace CDR_Analyzer
             }
         }
 
+        /// <summary>
+        /// Wyświetla informacje o przefiltrowaniu danych
+        /// </summary>
+        /// <param name="rowsCount">Liczba rekordów po przefiltrowaniu</param>
+        /// <param name="queryTime">Czas wykonania zapytania</param>
+        /// <param name="correctRequest">Sprawdza czy użytkownik wykonał poprawne zapytanie</param>
+        /// <returns>True jeśli użytkownik chce wyświetlić dane, inaczej false</returns>
         public static bool FilterDataMessage(long rowsCount, TimeSpan queryTime, bool correctRequest)
         {
             if (correctRequest)
@@ -98,6 +136,10 @@ namespace CDR_Analyzer
             return false;
         }
 
+        /// <summary>
+        /// Wyświetla dane strona po stronie
+        /// </summary>
+        /// <param name="data">Dane</param>
         public static void ShowListRecords(List<CallRecord> data)
         {
             int i = 0;
@@ -129,6 +171,9 @@ namespace CDR_Analyzer
             }
         }
 
+        /// <summary>
+        /// Wyświetla listę dostępnych filtrów
+        /// </summary>
         public static void FilterMenuMessage()
         {
             Console.WriteLine("\r*** Rodzaje filtrów ***");
@@ -141,6 +186,10 @@ namespace CDR_Analyzer
             Console.WriteLine("\nPo czym filtrujesz?");
         }
 
+        /// <summary>
+        /// Wyświetla szczegółowe instrukcje jak używać filtrów
+        /// </summary>
+        /// <param name="filterType">Wybrany typ filtru</param>
         public static void FilterInstructionMessage(string filterType)
         {
             switch (filterType)
@@ -166,32 +215,54 @@ namespace CDR_Analyzer
             }
         }
 
+        /// <summary>
+        /// Wyświetla wiadomość o błędu podczas filtrowania danych
+        /// </summary>
         public static void FilterErrorMessage()
         {
             Console.WriteLine("Niepoprawne polecenie, dane nie zostały przefiltrowane");
         }
 
+        /// <summary>
+        /// Wyświetla wiadomość dla użytkownika dotyczącą oczekiwania na zapytanie
+        /// </summary>
         public static void WaitForQuery()
         {
-            Console.WriteLine("Trwa wykonywanie zapytania, proszę czekać...");
+            Console.WriteLine("\rTrwa wykonywanie zapytania, proszę czekać...");
         }
 
+        /// <summary>
+        /// Wyświetla informację o możliwości zapisania przefiltrowanych danych do pliku
+        /// </summary>
         public static void SaveFilterMessage()
         {
             Console.WriteLine("\rWciśnij \"S\", aby zapisać przefiltrowane dane do pliku");
         }
         
+        /// <summary>
+        /// Wyświetla informację o możliwości dalszego działania na przefiltrowanych danych
+        /// </summary>
         public static void KeepFilteredData()
         {
             Console.WriteLine("\rWciśnij \"T\", aby nadal pracować na przefiltrowanych danych?");
         }
 
+        /// <summary>
+        /// Wyświetla informację o błędach podczas parsowania
+        /// </summary>
+        /// <param name="errMessage">Typ błędu</param>
         public static void ParseError(string errMessage)
         {
             Console.WriteLine(errMessage);
             Console.WriteLine("Wciśnij \"T\", aby kontynuować wykonanie programu ");
         }
 
+        /// <summary>
+        /// Wyświetla informację o błędach w parsowaniu konkretnej linii
+        /// </summary>
+        /// <param name="line">Parsowana linia</param>
+        /// <param name="lineNumber">Numer parsowanej linii</param>
+        /// <param name="parseMessage">Wykryty błąd</param>
         public static void ParseError(string line, long lineNumber, string parseMessage)
         {
             Console.WriteLine("Ten rekord (" + lineNumber + ") nie zostanie dodany:");
@@ -200,6 +271,11 @@ namespace CDR_Analyzer
             Console.WriteLine(parseMessage);
         }
 
+        /// <summary>
+        /// Formatuje wyświetlanie czasu zapytania, w zależności od jego długości
+        /// </summary>
+        /// <param name="queryTime">Czas zapytania</param>
+        /// <returns>String z opisem czasu zapytania</returns>
         private static string FormatRequestTime(TimeSpan queryTime)
         {
             if (queryTime.TotalMilliseconds < 1000)
