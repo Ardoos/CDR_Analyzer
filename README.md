@@ -7,23 +7,23 @@ Aplikacja umo¿liwia przechowywanie danych zarówno w bazie danych jak i w liœcie 
 Projekt tworzony by³ z u¿yciem Visual Studio 2017 i korzysta z niereleacyjnej bazy danych MongoDB. Program mo¿e byæ edytowany w dowolnym IDE, operacja na listach mog¹ byæ wykonywane nawet bez zainstalowanej bazy danych.
 
 ## Ustawienie projektu
-- W pliku 'Program.cs', na pocz¹tku funkcji main nale¿y u¿yæ funkcji 'SetFilePath' stworzonego wczeœniej 'ParserController', aby ustawiæ prawid³ow¹ œcie¿kê z danymi np. 'parserController.SetFilePath("..\\..\\cdr_small.txt");''
+- W pliku `Program.cs`, na pocz¹tku funkcji main nale¿y u¿yæ funkcji `SetFilePath` stworzonego wczeœniej `ParserController`, aby ustawiæ prawid³ow¹ œcie¿kê z danymi np. `parserController.SetFilePath("..\\..\\cdr_small.txt");`
 - Aby umo¿liwiæ dzia³anie na bazie danych MongoDB nale¿y wykonaæ nastêpuj¹ce operacje:
   * Zainstalowaæ *Community Server* [MongoDB](https://www.mongodb.com/download-center?#community)
-  * Stworzyæ bazê danych poleceniem 'use CDR_Data'
-  * Bêd¹c prze³¹czonym na now¹ bazê danych, stworzyæ kolekcjê poleceniem 'db.createCollection("CallRecords")'
-Ewentualne rozbie¿noœci co do nazw nale¿y skorygowaæ w pliku 'DB.cs'
+  * Stworzyæ bazê danych poleceniem `use CDR_Data`
+  * Bêd¹c prze³¹czonym na now¹ bazê danych, stworzyæ kolekcjê poleceniem `db.createCollection("CallRecords")`
+Ewentualne rozbie¿noœci co do nazw nale¿y skorygowaæ w pliku `DB.cs`
 
 ## Korzystanie z programu
 - Program daje mo¿liwoœæ przetwarzania danych w bazie danych MongoDB (domyœlnie) lub na listach, Ÿród³o tych danych mo¿na zmieniaæ w trakcie dzia³ania programu
 - Mo¿liwe operacje filtrowania:
   * Po numerze telefonu dzwoni¹cego, po wybraniu tej opcji nale¿y wpisaæ 11 cyfrowy numer
   * Po numerze telefonu odbieraj¹cego, po wybraniu tej opcji nale¿y wpisaæ 11 cyfrowy numer
-  * Po dacie rozpoczêcia po³¹czenia, wymagany jest jeden z operatorów *> = <*, nastêpnie data i opcjonalnie godzina np. '> 11/01/2017 17:05'
-  * Po dacie zakoñczenia po³¹czenia, wymagany jest jeden z operatorów *> = <*, nastêpnie data i opcjonalnie godzina np. '> 11/01/2017 17:05'
+  * Po dacie rozpoczêcia po³¹czenia, wymagany jest jeden z operatorów *> = <*, nastêpnie data i opcjonalnie godzina np. `> 11/01/2017 17:05`
+  * Po dacie zakoñczenia po³¹czenia, wymagany jest jeden z operatorów *> = <*, nastêpnie data i opcjonalnie godzina np. `> 11/01/2017 17:05`
   * Po rodzaju po³¹czenia, jeden z rodzajów po³¹czenia wybierany za pomoc¹ cyfry 1-6
-  * Po op³acie za po³¹czenie, nale¿y podaæ jeden z operatorow *> = <* oraz kwotê np. '> 25'
-- Mo¿liwe jest zapisanie przefiltrowanie danych do pliku, domyœlnie jest to plik 'filtered.txt' w folderze g³ównym 'CDR_Analyzer', mo¿na to zmieniæ w pliku 'SaveData.cs' w linijce 'System.IO.File.WriteAllLines("..\\..\\filtered.txt", lines);'
+  * Po op³acie za po³¹czenie, nale¿y podaæ jeden z operatorow *> = <* oraz kwotê np. `> 25`
+- Mo¿liwe jest zapisanie przefiltrowanie danych do pliku, domyœlnie jest to plik `filtered.txt` w folderze g³ównym `CDR_Analyzer`, mo¿na to zmieniæ w pliku `SaveData.cs` w linijce `System.IO.File.WriteAllLines("..\\..\\filtered.txt", lines);`
 - Dzia³anie na przefiltrowanych danych jest mo¿liwe, bez wzglêdu na Ÿród³o danych odbywa siê ono na listach, aby nie by³o mo¿liwoœci nadpisania pierwotnych danych w bazie
 - W ka¿dym momencie mo¿liwe jest ponowne wczytanie danych z pliku
 

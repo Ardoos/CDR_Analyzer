@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## CDR-Analyzer
 
+## 1.1.3 - 2018-06-14
+### Poprawione
+ - Formatowanie w pliku README.md
+
 ## 1.1.2 - 2018-06-14
 ### Dodane
  - Instrukcje w pliku README.md
